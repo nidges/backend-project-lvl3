@@ -6,5 +6,4 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/233dd82edbb1a665cd06/test_coverage)](https://codeclimate.com/github/nidges/backend-project-lvl3/test_coverage)
 
 ### GitHub Actions
-[![my workflow](https://github.com/nidges/backend-project-lvl2/actions/workflows/my-workflow.yml/badge.svg?event=push)](https://github.com/nidges/backend-project-lvl2/actions/workflows/my-workflow.yml)
-  
+[![my workflow](https://github.com/nidges/backend-project-lvl3/actions/workflows/my-workflow.yml/badge.svg?event=push)](https://github.com/nidges/backend-project-lvl3/actions/workflows/my-workflow.yml)
