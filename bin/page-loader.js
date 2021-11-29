@@ -14,7 +14,7 @@ program
   .argument('<url>')
   .action((url) => {
     Promise.resolve(pageLoader(program.opts().output, url))
-      .then((data) => console.log('here comes the path to downloaded HTML', data));
+      .then((data) => console.log(`Page was successfully downloaded into '${data}'`));
   });
 
 program.parse();

@@ -7,3 +7,6 @@
 
 ### GitHub Actions
 [![my workflow](https://github.com/nidges/backend-project-lvl3/actions/workflows/my-workflow.yml/badge.svg?event=push)](https://github.com/nidges/backend-project-lvl3/actions/workflows/my-workflow.yml)
+
+### Page Loader - downloading HTML file for given URL
+[![asciicast](https://asciinema.org/a/SA6aoZtr2AruNBvLGm2QaJcvl.svg)](https://asciinema.org/a/SA6aoZtr2AruNBvLGm2QaJcvl)

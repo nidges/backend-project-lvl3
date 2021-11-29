@@ -1,5 +1,7 @@
 node_modules/
 .idea/
+src/try2.js
+src/buff.js
 
 # Ignore test-related files
 /coverage.data
