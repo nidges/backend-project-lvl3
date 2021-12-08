@@ -10,39 +10,43 @@ const __dirname = path.dirname(__filename);
 const getFixturePath = (filename) => path.join(__dirname, '..', '__fixtures__', filename);
 
 let tempDirPath;
-let fakeResponseBody;
+let fakeHTML;
 let expectedHTML;
-let pathToPNG;
+let pathToActualPNG;
 let expectedPNG;
 
 beforeAll(async () => {
-  fakeResponseBody = await fsp.readFile(getFixturePath('HTML-response.html'), 'utf8');
+  // /var/folders/q2/cr_939816rzc8dsxp9bb8g5m0000gn/T/ cmd+shift+G in finder to access
+  fakeHTML = await fsp.readFile(getFixturePath('fakeHTML.html'), 'utf8');
   expectedHTML = await fsp.readFile(getFixturePath('expectedHTML.html'), 'utf8');
-  expectedPNG = await fsp.readFile(getFixturePath('expectedPNG.png'), 'base64');
+  expectedPNG = await fsp.readFile(getFixturePath('expectedPNG.png'));
+  tempDirPath = await fsp.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
+  pathToActualPNG = path.join(tempDirPath, 'ru-hexlet-io-courses_files', 'ru-hexlet-io-assets-professions-nodejs.png');
+
   nock.disableNetConnect();
 });
 
 beforeEach(async () => {
-  // /var/folders/q2/cr_939816rzc8dsxp9bb8g5m0000gn/T/ cmd+shift+G in finder to access
-  tempDirPath = await fsp.mkdtemp(path.join(os.tmpdir(), 'page-loader-'));
-  pathToPNG = path.join(tempDirPath, 'ru-hexlet-io-courses_files', 'ru-hexlet-io-assets-professions-nodejs.png');
+
 });
 
 test('correct run: folder, files and their contents', async () => {
   nock(/ru\.hexlet\.io/)
     .get(/\/courses/)
-    .reply(200, fakeResponseBody);
+    .reply(200, fakeHTML)
+    .get(/\/assets\/professions\/nodejs\./)
+    .replyWithFile(200, getFixturePath('expectedPNG.png'))
+    .get(/\/professions\/nodejs/)
+    .reply(200, 'this is professions.nodejs - must be html');
 
-  const filePath = await pageLoader(tempDirPath, 'https://ru.hexlet.io/courses');
-  expect(filePath).toBe(path.join(tempDirPath, 'ru-hexlet-io-courses.html'));
+  const coreHTMLPath = await pageLoader(tempDirPath, 'https://ru.hexlet.io/courses');
+  expect(coreHTMLPath).toBe(path.join(tempDirPath, 'ru-hexlet-io-courses.html'));
 
-  const loadedHTML = await fsp.readFile(filePath, 'utf8');
-  expect(loadedHTML).toEqual(expectedHTML);
+  const actualCoreHTML = await fsp.readFile(coreHTMLPath, 'utf8');
+  expect(actualCoreHTML).toEqual(expectedHTML);
 
-  pathToPNG = path.join(tempDirPath, 'ru-hexlet-io-courses_files', 'ru-hexlet-io-assets-professions-nodejs.png');
-  //возможно, это надо получать из функции, но кажется достаточно проверить просто совпадение содержимого
-  const loadedPNG = await fsp.readFile(pathToPNG, 'base64');
-  expect(loadedPNG).toEqual(expectedPNG);
+  const actualPNG = await fsp.readFile(pathToActualPNG);
+  expect(actualPNG).toEqual(expectedPNG);
 });
 
 test('errors', async () => {
