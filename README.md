@@ -10,3 +10,6 @@
 
 ### Page Loader - downloading HTML file for given URL
 [![asciicast](https://asciinema.org/a/SA6aoZtr2AruNBvLGm2QaJcvl.svg)](https://asciinema.org/a/SA6aoZtr2AruNBvLGm2QaJcvl)
+
+### Page Loader - downloading core HTML, inner pics, creating folder
+[![asciicast](https://asciinema.org/a/0bCA2f0OdqSS0gajM4XlzD1qX.svg)](https://asciinema.org/a/0bCA2f0OdqSS0gajM4XlzD1qX)
