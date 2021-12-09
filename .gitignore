@@ -2,6 +2,7 @@ node_modules/
 .idea/
 src/try2.js
 src/buff.js
+page-loader/
 
 # Ignore test-related files
 /coverage.data

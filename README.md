@@ -13,3 +13,6 @@
 
 ### Page Loader - downloading core HTML, inner pics, creating folder
 [![asciicast](https://asciinema.org/a/0bCA2f0OdqSS0gajM4XlzD1qX.svg)](https://asciinema.org/a/0bCA2f0OdqSS0gajM4XlzD1qX)
+
+### Page Loader - downloading core HTML and all page resources, which go into folder
+[![asciicast](https://asciinema.org/a/ADLgDf4UTKjjcJ7eZfEvBrgJw.svg)](https://asciinema.org/a/ADLgDf4UTKjjcJ7eZfEvBrgJw)
