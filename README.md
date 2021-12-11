@@ -16,3 +16,6 @@
 
 ### Page Loader - downloading core HTML and all page resources, which go into folder
 [![asciicast](https://asciinema.org/a/ADLgDf4UTKjjcJ7eZfEvBrgJw.svg)](https://asciinema.org/a/ADLgDf4UTKjjcJ7eZfEvBrgJw)
+
+### Page Loader - logger example
+[![asciicast](https://asciinema.org/a/fKK6l7AVwDC4SaeGWqXWhLULs.svg)](https://asciinema.org/a/fKK6l7AVwDC4SaeGWqXWhLULs)
