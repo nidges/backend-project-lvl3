@@ -1,8 +1,11 @@
 import path from 'path';
 
+const sourceExtensions = ['.png', 'jpeg', '.jpg', '.css', '.js', '.html'];
+export const imageExtensions = ['.png', '.jpeg', '.jpg'];
+
 export function getExtension(urlInstance) {
   const extension = path.parse(urlInstance.pathname).ext;
-  return extension || '.html';
+  return sourceExtensions.includes(extension) ? extension : '.html';
 }
 
 export function getAxiosConfig(urlInstance) {
@@ -11,25 +14,42 @@ export function getAxiosConfig(urlInstance) {
     url: urlInstance.toString(),
   };
 
-  if (['.png', '.jpg'].includes(getExtension(urlInstance))) {
+  if (imageExtensions.includes(getExtension(urlInstance))) {
     return Object.assign(defaultConfig, { responseType: 'stream' });
   }
   return defaultConfig;
 }
 
 export function getFileName(urlInstance) {
-  const urlFullPath = `${urlInstance.host}${urlInstance.pathname}`;
+  let urlFullPath = `${urlInstance.host}${urlInstance.pathname}`;
+  if (urlFullPath[urlFullPath.length -1] === '/') {
+    urlFullPath = urlFullPath.slice(0, -1);
+  }
 
-  // removing extension
-  const urlPathNoExtension = `${path.parse(urlFullPath).dir}/${path.parse(urlFullPath).name}`;
+  // removing extension if there is one
+  const extension = path.parse(urlInstance.pathname).ext;
+  if (sourceExtensions.includes(extension)) {
+    urlFullPath = `${path.parse(urlFullPath).dir}/${path.parse(urlFullPath).name}`;
+  }
+
   const regJustSymbols = /\W/;
-  const urlPathNoSymbols = urlPathNoExtension
+  return urlFullPath
     .split('')
     .map((letter) => {
       if (regJustSymbols.test(letter)) return '-';
       return letter;
     })
     .join('');
+}
 
-  return `${urlPathNoSymbols}${getExtension(urlInstance)}`;
+export function normalizeLink(coreUrl, link) {
+  const { origin } = coreUrl;
+
+  if (link.includes(origin) || link[0] === '/') {
+    return new URL(link, origin);
+  } else if (link.includes('http')) {
+    return new URL(link);
+  } else {
+    return new URL(`${path.parse(coreUrl.toString()).dir}/${link}`);
+  }
 }

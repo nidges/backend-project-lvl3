@@ -7,13 +7,14 @@ import debug from 'debug';
 import Source from './classes/Source.js';
 import ImageSource from './classes/ImageSource.js';
 import CoreHTML from './classes/CoreHTML.js';
-import { getAxiosConfig, getExtension } from './utils.js';
+import { getAxiosConfig, getExtension, imageExtensions } from './utils.js';
+import SourceFactory from './classes/SourceFactory.js';
 
 const logger = debug('page-loader');
 
 export default function pageLoader(outputPath, url) {
   const coreHTML = new CoreHTML(outputPath, url);
-  const folderName = `${coreHTML.name.slice(0, -5)}_files`;
+  const folderName = `${coreHTML.name}_files`;
   const coreAxiosConfig = getAxiosConfig(coreHTML.url);
   let localLinks = [];
 
@@ -21,25 +22,18 @@ export default function pageLoader(outputPath, url) {
     .then((response) => {
       logger(`Request to ${url} responded with status ${response.status}.`);
       localLinks = coreHTML.extractLocalLinks(response.data);
-      return coreHTML.reWriteLocalLinks(response.data, folderName);
+      return coreHTML.setSourceData(response.data);
     })
     .then(() => {
-      logger(`Core HTML "${coreHTML.name}" has been saved to "${outputPath}"`);
+      logger(`Core HTML "${coreHTML.name}${coreHTML.extension}" has been saved to "${outputPath}"`);
     })
     .then(() => fsp.mkdir(path.join(outputPath, folderName)))
     .then(() => {
       const newOutputPath = path.join(outputPath, folderName);
       const promises = localLinks
         .map((link) => {
-          const extension = getExtension(new URL(link));
-          let source;
-
-          if (['.png', '.jpg'].includes(extension)) {
-            source = new ImageSource(newOutputPath, link);
-          } else {
-            source = new Source(newOutputPath, link);
-          }
-
+          const sourceConstructor = SourceFactory.factory(link);
+          const source = new sourceConstructor(newOutputPath, link);
           const axiosConfig = getAxiosConfig(source.url);
 
           return axios(axiosConfig)
@@ -48,19 +42,20 @@ export default function pageLoader(outputPath, url) {
               return source.setSourceData(response.data);
             })
             .then(() => {
-              logger(`File "${source.name}" has been saved to "${newOutputPath}"`);
+              logger(`File "${source.name}${source.extension}" has been saved to "${newOutputPath}"`);
             });
+
         });
-      return Promise.all(promises);
+       return Promise.all(promises);
     })
     .then(() => coreHTML.path)
     .catch((error) => {
       if (error.response) {
-        logger(`Error! Request to ${url} responded with status ${error.response.status}.`);
-        console.log('error! responded with code', error.response.status);
-        throw new Error(`error! responded with code ${error.response.status}`);
+        logger(`Error! Request to ${error.response.config.url} responded with code ${error.response.status}`);
+        // console.error(`Error! Request to ${error.response.config.url} responded with code`, error.response.status);
+        throw new Error(`Error! Request to ${error.response.config.url} responded with code ${error.response.status}`);
       } else {
-        console.log('error!', error.message);
+        // console.error('error!', error.message);
         throw new Error(`error! ${error.message}`);
       }
     });
@@ -105,5 +100,10 @@ export default function pageLoader(outputPath, url) {
 //   .reply(200, 'a {\n' +
 //     '    color: red;\n' +
 //     '}\n');
+
+// nock.disableNetConnect();
+// nock(/ru\.hexlet\.io/)
+//   .get('/courses')
+//   .reply(400, '');
 
 // pageLoader(outputPath, myUrl, {  });

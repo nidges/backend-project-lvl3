@@ -14,7 +14,11 @@ program
   .argument('<url>')
   .action((url) => {
     Promise.resolve(pageLoader(program.opts().output, url))
-      .then((data) => console.log(`Page was successfully downloaded into '${data}'`));
+      .then((data) => console.log(`Page was successfully downloaded into '${data}'`))
+      .catch((e) => {
+        console.error(e);
+        process.exitCode = 1;
+    });
   });
 
 program.parse();

@@ -82,7 +82,7 @@ test('errors', async () => {
     .reply(400, '');
 
   expect.assertions(1);
-  await expect(pageLoader(tempDirPath, 'https://ru.hexlet.io/courses')).rejects.toThrow('error! responded with code 400');
+  await expect(pageLoader(tempDirPath, 'https://ru.hexlet.io/courses')).rejects.toThrow('Error! Request to https://ru.hexlet.io/courses responded with code 400');
   // return pageLoader(tempDirPath, 'https://ru.hexlet.io/courses').catch((e) => expect(e.message).toEqual('error! responded with code 400'));
   // линтер ругается что expect в коллбеке
 });

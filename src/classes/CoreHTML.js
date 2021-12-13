@@ -2,7 +2,8 @@ import cheerio from 'cheerio';
 import prettier from 'prettier/standalone.js';
 import parserHTML from 'prettier/parser-html.js';
 import Source from './Source.js';
-import { getFileName } from '../utils.js';
+import { getExtension, getFileName, normalizeLink } from '../utils.js';
+import fsp from 'fs/promises';
 
 export default class CoreHTML extends Source {
   static mapping = {
@@ -25,33 +26,39 @@ export default class CoreHTML extends Source {
     });
 
     return links
-      .map((link) => new URL(link, origin))
+      .filter(Boolean)
+      .map((link) => normalizeLink(this.url, link))
       .filter((link) => link.origin === origin)
       .map((link) => link.toString());
   }
 
-  reWriteLocalLinks(html, folderName) {
+  setSourceData(html) {
     const $ = cheerio.load(html);
     const { origin } = this.url;
+    const coreUrl = this.url;
+    const folderName = `${this.name}_files`;
 
     CoreHTML.tags.forEach((tag) => {
       $(tag).each(function () {
         const relativeLink = $(this).attr(CoreHTML.mapping[tag]);
-        const absoluteLink = new URL(relativeLink, origin);
-        let resultingLink = '';
+        console.log('relativeLink', relativeLink);
+        if (relativeLink) {
+          // const absoluteLink = new URL(relativeLink, origin);
+          const absoluteLink = normalizeLink(coreUrl, relativeLink)
+          let resultingLink = '';
 
-        if (absoluteLink.origin === origin) {
-          resultingLink = `${folderName}/${getFileName(absoluteLink)}`;
-        } else {
-          resultingLink = absoluteLink.toString();
+          if (absoluteLink.origin === origin) {
+            resultingLink = `${folderName}/${getFileName(absoluteLink)}${getExtension(absoluteLink)}`;
+          } else {
+            resultingLink = absoluteLink.toString();
+          }
+
+          $(this).attr(CoreHTML.mapping[tag], resultingLink);
         }
-
-        $(this).attr(CoreHTML.mapping[tag], resultingLink);
       });
     });
 
-    const prettierHTML = prettier.format($.html(), { parser: 'html', plugins: [parserHTML] });
-
-    return this.setSourceData(prettierHTML);
+    const prettierHTML =  prettier.format($.html(), { parser: 'html', plugins: [parserHTML] });
+    return fsp.writeFile(this.path, prettierHTML, 'utf8');
   }
 }
