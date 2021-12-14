@@ -1,9 +1,9 @@
 import cheerio from 'cheerio';
 import prettier from 'prettier/standalone.js';
 import parserHTML from 'prettier/parser-html.js';
+import fsp from 'fs/promises';
 import Source from './Source.js';
 import { getExtension, getFileName, normalizeLink } from '../utils.js';
-import fsp from 'fs/promises';
 
 export default class CoreHTML extends Source {
   static mapping = {
@@ -41,10 +41,10 @@ export default class CoreHTML extends Source {
     CoreHTML.tags.forEach((tag) => {
       $(tag).each(function () {
         const relativeLink = $(this).attr(CoreHTML.mapping[tag]);
-        console.log('relativeLink', relativeLink);
+        // console.log('relativeLink', relativeLink);
         if (relativeLink) {
           // const absoluteLink = new URL(relativeLink, origin);
-          const absoluteLink = normalizeLink(coreUrl, relativeLink)
+          const absoluteLink = normalizeLink(coreUrl, relativeLink);
           let resultingLink = '';
 
           if (absoluteLink.origin === origin) {
@@ -58,7 +58,7 @@ export default class CoreHTML extends Source {
       });
     });
 
-    const prettierHTML =  prettier.format($.html(), { parser: 'html', plugins: [parserHTML] });
+    const prettierHTML = prettier.format($.html(), { parser: 'html', plugins: [parserHTML] });
     return fsp.writeFile(this.path, prettierHTML, 'utf8');
   }
 }

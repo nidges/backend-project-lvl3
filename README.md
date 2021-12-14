@@ -19,3 +19,6 @@
 
 ### Page Loader - logger example
 [![asciicast](https://asciinema.org/a/fKK6l7AVwDC4SaeGWqXWhLULs.svg)](https://asciinema.org/a/fKK6l7AVwDC4SaeGWqXWhLULs)
+
+### Page Loader - error handling example
+[![asciicast](https://asciinema.org/a/oNBFtXlCMdYDTO5GKeL8GlZTw.svg)](https://asciinema.org/a/oNBFtXlCMdYDTO5GKeL8GlZTw)

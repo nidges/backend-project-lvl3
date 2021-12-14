@@ -16,9 +16,9 @@ program
     Promise.resolve(pageLoader(program.opts().output, url))
       .then((data) => console.log(`Page was successfully downloaded into '${data}'`))
       .catch((e) => {
-        console.error(e);
+        console.error(e.message);
         process.exitCode = 1;
-    });
+      });
   });
 
 program.parse();

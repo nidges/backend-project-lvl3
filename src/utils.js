@@ -22,7 +22,7 @@ export function getAxiosConfig(urlInstance) {
 
 export function getFileName(urlInstance) {
   let urlFullPath = `${urlInstance.host}${urlInstance.pathname}`;
-  if (urlFullPath[urlFullPath.length -1] === '/') {
+  if (urlFullPath[urlFullPath.length - 1] === '/') {
     urlFullPath = urlFullPath.slice(0, -1);
   }
 
@@ -47,9 +47,8 @@ export function normalizeLink(coreUrl, link) {
 
   if (link.includes(origin) || link[0] === '/') {
     return new URL(link, origin);
-  } else if (link.includes('http')) {
+  } if (link.includes('http')) {
     return new URL(link);
-  } else {
-    return new URL(`${path.parse(coreUrl.toString()).dir}/${link}`);
   }
+  return new URL(`${path.parse(coreUrl.toString()).dir}/${link}`);
 }
