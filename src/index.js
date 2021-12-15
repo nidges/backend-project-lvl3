@@ -3,11 +3,12 @@ import axios from 'axios';
 // import axiosDebug from 'axios-debug-log';
 import fsp from 'fs/promises';
 import fs from 'fs';
-// import nock from 'nock';
+import nock from 'nock';
 import debug from 'debug';
 import CoreHTML from './classes/CoreHTML.js';
 import { getAxiosConfig } from './utils.js';
 import SourceFactory from './classes/SourceFactory.js';
+import Listr from 'listr';
 
 const logger = debug('page-loader');
 
@@ -30,27 +31,72 @@ export default function pageLoader(outputPath, url) {
     .then(() => fsp.mkdir(path.join(outputPath, folderName)))
     .then(() => {
       const newOutputPath = path.join(outputPath, folderName);
+      // const promises = localLinks
+      //   .map((link) => {
+      //     const SourceConstructor = SourceFactory.factory(link);
+      //     const source = new SourceConstructor(newOutputPath, link);
+      //     const axiosConfig = getAxiosConfig(source.url);
+      //
+      //     return axios(axiosConfig)
+      //       .then((response) => {
+      //         logger(`Request to ${link} responded with status ${response.status}.`);
+      //         return source.setSourceData(response.data);
+      //       })
+      //       .then(() => {
+      //         logger(`File "${source.name}${source.extension}" has been saved to "${newOutputPath}"`);
+      //       })
+      //       .catch((error) => {
+      //         logger(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
+      //         console.log(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
+      //         return Promise.resolve();
+      //       });
+      //   });
+      // return Promise.all(promises)
+
       const promises = localLinks
         .map((link) => {
           const SourceConstructor = SourceFactory.factory(link);
           const source = new SourceConstructor(newOutputPath, link);
           const axiosConfig = getAxiosConfig(source.url);
 
-          return axios(axiosConfig)
-            .then((response) => {
-              logger(`Request to ${link} responded with status ${response.status}.`);
-              return source.setSourceData(response.data);
-            })
-            .then(() => {
-              logger(`File "${source.name}${source.extension}" has been saved to "${newOutputPath}"`);
-            })
-            .catch((error) => {
-              logger(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
-              console.log(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
-              return Promise.resolve();
-            });
+          // const promise = axios(axiosConfig)
+          //   .then((response) => {
+          //     logger(`Request to ${link} responded with status ${response.status}.`);
+          //     return source.setSourceData(response.data);
+          //   })
+          //   .then(() => {
+          //     logger(`File "${source.name}${source.extension}" has been saved to "${newOutputPath}"`);
+          //   })
+          //   .catch((error) => {
+          //     logger(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
+          //     console.log(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
+          //     return Promise.reject(new Error(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`));
+          //     // return Promise.resolve();
+          //   });
+
+          const listr = new Listr([
+            {
+              title: link,
+              task: (ctx, task) => axios(axiosConfig)
+                .then((response) => {
+                  logger(`Request to ${link} responded with status ${response.status}.`);
+                  return source.setSourceData(response.data);
+                })
+                .then(() => {
+                  logger(`File "${source.name}${source.extension}" has been saved to "${newOutputPath}"`);
+                })
+                .catch((error) => {
+                  logger(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
+                  task.skip(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
+                })
+            }
+          ])
+
+          return listr.run();
         });
+
       return Promise.all(promises);
+
     })
     .then(() => coreHTML.path)
     .catch((error) => {
