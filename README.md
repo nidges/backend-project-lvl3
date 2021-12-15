@@ -22,3 +22,6 @@
 
 ### Page Loader - error handling example
 [![asciicast](https://asciinema.org/a/oNBFtXlCMdYDTO5GKeL8GlZTw.svg)](https://asciinema.org/a/oNBFtXlCMdYDTO5GKeL8GlZTw)
+
+### Page Loader - progress visualisation
+[![asciicast](https://asciinema.org/a/PKnwJCOWt35VqOZKZ8pLDZEsU.svg)](https://asciinema.org/a/PKnwJCOWt35VqOZKZ8pLDZEsU)

@@ -53,7 +53,7 @@ export default function pageLoader(outputPath, url) {
       //   });
       // return Promise.all(promises)
 
-      const promises = localLinks
+      const listrTasksPromises = localLinks
         .map((link) => {
           const SourceConstructor = SourceFactory.factory(link);
           const source = new SourceConstructor(newOutputPath, link);
@@ -74,28 +74,45 @@ export default function pageLoader(outputPath, url) {
           //     // return Promise.resolve();
           //   });
 
-          const listr = new Listr([
-            {
-              title: link,
-              task: (ctx, task) => axios(axiosConfig)
-                .then((response) => {
-                  logger(`Request to ${link} responded with status ${response.status}.`);
-                  return source.setSourceData(response.data);
-                })
-                .then(() => {
-                  logger(`File "${source.name}${source.extension}" has been saved to "${newOutputPath}"`);
-                })
-                .catch((error) => {
-                  logger(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
-                  task.skip(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
-                })
-            }
-          ])
+          // const listr = new Listr([
+          //   {
+          //     title: link,
+          //     task: (ctx, task) => axios(axiosConfig)
+          //       .then((response) => {
+          //         logger(`Request to ${link} responded with status ${response.status}.`);
+          //         return source.setSourceData(response.data);
+          //       })
+          //       .then(() => {
+          //         logger(`File "${source.name}${source.extension}" has been saved to "${newOutputPath}"`);
+          //       })
+          //       .catch((error) => {
+          //         logger(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
+          //         task.skip(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
+          //       })
+          //   }
+          // ])
+          //
+          // return listr.run();
 
-          return listr.run();
+          return {
+            title: link,
+            task: (ctx, task) => axios(axiosConfig)
+              .then((response) => {
+                logger(`Request to ${link} responded with status ${response.status}.`);
+                return source.setSourceData(response.data);
+              })
+              .then(() => {
+                logger(`File "${source.name}${source.extension}" has been saved to "${newOutputPath}"`);
+              })
+              .catch((error) => {
+                logger(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
+                task.skip(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
+              })
+          }
         });
-
-      return Promise.all(promises);
+      const tasks = new Listr(listrTasksPromises, { concurrent: true });
+      return Promise.resolve(tasks.run());
+      // return Promise.all(promises);
 
     })
     .then(() => coreHTML.path)
