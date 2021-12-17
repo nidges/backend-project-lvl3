@@ -14,6 +14,7 @@ export function getAxiosConfig(urlInstance) {
     url: urlInstance.toString(),
   };
 
+  // different config for images
   if (imageExtensions.includes(getExtension(urlInstance))) {
     return Object.assign(defaultConfig, { responseType: 'stream' });
   }
@@ -21,6 +22,7 @@ export function getAxiosConfig(urlInstance) {
 }
 
 export function getFileName(urlInstance) {
+  // normalizing
   let urlFullPath = `${urlInstance.host}${urlInstance.pathname}`;
   if (urlFullPath[urlFullPath.length - 1] === '/') {
     urlFullPath = urlFullPath.slice(0, -1);
@@ -32,6 +34,7 @@ export function getFileName(urlInstance) {
     urlFullPath = `${path.parse(urlFullPath).dir}/${path.parse(urlFullPath).name}`;
   }
 
+  // changing all not word symbols to dashes
   const regJustSymbols = /\W/;
   return urlFullPath
     .split('')
@@ -41,6 +44,9 @@ export function getFileName(urlInstance) {
     })
     .join('');
 }
+
+// transforming absolute and two types of relative links
+// (from root and from current folder) to absolute links with correct [base]
 
 export function normalizeLink(coreUrl, link) {
   const { origin } = coreUrl;

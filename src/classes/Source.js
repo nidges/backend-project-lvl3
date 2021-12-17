@@ -10,9 +10,9 @@ export default class Source {
     this.path = path.join(outputPath, `${this.name}${this.extension}`);
   }
 
-  // getSourceData() {
-  //   return fsp.readFile(this.path, 'utf8');
-  // }
+  getSourceData() {
+    return fsp.readFile(this.path, 'utf8');
+  }
 
   setSourceData(data) {
     return fsp.writeFile(this.path, data, 'utf8');

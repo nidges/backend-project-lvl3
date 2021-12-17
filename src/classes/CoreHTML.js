@@ -38,12 +38,12 @@ export default class CoreHTML extends Source {
     const coreUrl = this.url;
     const folderName = `${this.name}_files`;
 
+    // rewriting all links to core page's sources in HTML attributes
+    // only links to the same third level domain pages are rewritten
     CoreHTML.tags.forEach((tag) => {
       $(tag).each(function () {
         const relativeLink = $(this).attr(CoreHTML.mapping[tag]);
-        // console.log('relativeLink', relativeLink);
         if (relativeLink) {
-          // const absoluteLink = new URL(relativeLink, origin);
           const absoluteLink = normalizeLink(coreUrl, relativeLink);
           let resultingLink = '';
 
@@ -58,6 +58,7 @@ export default class CoreHTML extends Source {
       });
     });
 
+    // already rewritten HTML goes into the file so this method is polymorphic
     const prettierHTML = prettier.format($.html(), { parser: 'html', plugins: [parserHTML] });
     return fsp.writeFile(this.path, prettierHTML, 'utf8');
   }

@@ -3,16 +3,17 @@ import axios from 'axios';
 // import axiosDebug from 'axios-debug-log';
 import fsp from 'fs/promises';
 import fs from 'fs';
-import nock from 'nock';
+// import nock from 'nock';
 import debug from 'debug';
+import Listr from 'listr';
 import CoreHTML from './classes/CoreHTML.js';
 import { getAxiosConfig } from './utils.js';
 import SourceFactory from './classes/SourceFactory.js';
-import Listr from 'listr';
 
 const logger = debug('page-loader');
 
 export default function pageLoader(outputPath, url) {
+  // CoreHTML is a class for the HTML file that can be opened locally later
   const coreHTML = new CoreHTML(outputPath, url);
   const folderName = `${coreHTML.name}_files`;
   const coreAxiosConfig = getAxiosConfig(coreHTML.url);
@@ -22,6 +23,8 @@ export default function pageLoader(outputPath, url) {
     .then(() => axios(coreAxiosConfig))
     .then((response) => {
       logger(`Request to ${url} responded with status ${response.status}.`);
+      // this is a list of links with the same third level domain as the CoreHTML link
+      // all of them lead to Sources that should be downloaded into the folder
       localLinks = coreHTML.extractLocalLinks(response.data);
       return coreHTML.setSourceData(response.data);
     })
@@ -31,69 +34,16 @@ export default function pageLoader(outputPath, url) {
     .then(() => fsp.mkdir(path.join(outputPath, folderName)))
     .then(() => {
       const newOutputPath = path.join(outputPath, folderName);
-      // const promises = localLinks
-      //   .map((link) => {
-      //     const SourceConstructor = SourceFactory.factory(link);
-      //     const source = new SourceConstructor(newOutputPath, link);
-      //     const axiosConfig = getAxiosConfig(source.url);
-      //
-      //     return axios(axiosConfig)
-      //       .then((response) => {
-      //         logger(`Request to ${link} responded with status ${response.status}.`);
-      //         return source.setSourceData(response.data);
-      //       })
-      //       .then(() => {
-      //         logger(`File "${source.name}${source.extension}" has been saved to "${newOutputPath}"`);
-      //       })
-      //       .catch((error) => {
-      //         logger(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
-      //         console.log(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
-      //         return Promise.resolve();
-      //       });
-      //   });
-      // return Promise.all(promises)
 
       const listrTasksPromises = localLinks
         .map((link) => {
+          // creating Source objects depending on their type (text or image)
+          // these Source files are stored in the folder and are connected to CoreHTML file
           const SourceConstructor = SourceFactory.factory(link);
           const source = new SourceConstructor(newOutputPath, link);
           const axiosConfig = getAxiosConfig(source.url);
 
-          // const promise = axios(axiosConfig)
-          //   .then((response) => {
-          //     logger(`Request to ${link} responded with status ${response.status}.`);
-          //     return source.setSourceData(response.data);
-          //   })
-          //   .then(() => {
-          //     logger(`File "${source.name}${source.extension}" has been saved to "${newOutputPath}"`);
-          //   })
-          //   .catch((error) => {
-          //     logger(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
-          //     console.log(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
-          //     return Promise.reject(new Error(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`));
-          //     // return Promise.resolve();
-          //   });
-
-          // const listr = new Listr([
-          //   {
-          //     title: link,
-          //     task: (ctx, task) => axios(axiosConfig)
-          //       .then((response) => {
-          //         logger(`Request to ${link} responded with status ${response.status}.`);
-          //         return source.setSourceData(response.data);
-          //       })
-          //       .then(() => {
-          //         logger(`File "${source.name}${source.extension}" has been saved to "${newOutputPath}"`);
-          //       })
-          //       .catch((error) => {
-          //         logger(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
-          //         task.skip(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
-          //       })
-          //   }
-          // ])
-          //
-          // return listr.run();
-
+          // we are creating an array of objects correlating with Listr signature
           return {
             title: link,
             task: (ctx, task) => axios(axiosConfig)
@@ -107,13 +57,12 @@ export default function pageLoader(outputPath, url) {
               .catch((error) => {
                 logger(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
                 task.skip(`Warning! Unable to download source from ${error.config.url}. Skipping. Error: ${error.message}`);
-              })
-          }
+              }),
+          };
         });
+      // all Listr tasks will be performed simultaneously due to "concurrent: true" flag
       const tasks = new Listr(listrTasksPromises, { concurrent: true });
       return Promise.resolve(tasks.run());
-      // return Promise.all(promises);
-
     })
     .then(() => coreHTML.path)
     .catch((error) => {

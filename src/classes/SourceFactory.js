@@ -8,6 +8,6 @@ export default class SourceFactory {
 
     if (imageExtensions.includes(extension)) {
       return ImageSource;
-    } else return Source;
+    } return Source;
   }
 }
