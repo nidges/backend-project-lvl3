@@ -2,8 +2,6 @@ import path from 'path';
 import fsp from 'fs/promises';
 import { getFileName, getExtension } from '../utils.js';
 import fs from 'fs';
-// import prettier from 'prettier/standalone';
-// import parserHTML from 'prettier/parser-html';
 
 export default class Source {
   constructor(outputPath, url) {
@@ -13,9 +11,9 @@ export default class Source {
     this.path = path.join(outputPath, `${this.name}${this.extension}`);
   }
 
-  getSourceData() {
-    return fsp.readFile(this.path, 'utf8');
-  }
+  // getSourceData() {
+  //   return fsp.readFile(this.path, 'utf8');
+  // }
 
   setSourceData(data) {
     // if (this.extension === '.css') {
