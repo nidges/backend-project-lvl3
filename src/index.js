@@ -39,7 +39,13 @@ export default function pageLoader(url, outputPath) {
           // these Source files are stored in the folder and are connected to CoreHTML file
           const SourceConstructor = SourceFactory.factory(link);
           const source = new SourceConstructor(newOutputPath, link);
-          const axiosConfig = getAxiosConfig(source.url);
+          // const axiosConfig = getAxiosConfig(source.url);
+
+          const axiosConfig = {
+            method: 'get',
+            url: link,
+            responseType: 'stream',
+          };
 
           // we are creating an array of objects correlating with Listr signature
           return {

@@ -73,9 +73,11 @@ test('correct run: folder, files and their contents', async () => {
   expect(actualPNG).toEqual(expectedPNG);
 
   const actualScript = await fsp.readFile(pathToActualScript, 'utf8');
+  console.log('actualScript', actualScript);
   expect(actualScript).toEqual(expectedScript);
 
   const actualCSS = await fsp.readFile(pathToActualCSS, 'utf8');
+  console.log('actualCSS', actualCSS);
   expect(actualCSS).toEqual(expectedCSS);
 });
 
