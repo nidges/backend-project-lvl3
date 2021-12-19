@@ -29,7 +29,7 @@ beforeAll(async () => {
 
   expectedScript = await fsp.readFile(getFixturePath('expectedScript.js'));
 
-  expectedCSS = await fsp.readFile(getFixturePath('expectedCSS.css'));
+  expectedCSS = await fsp.readFile(getFixturePath('expectedCSS.css'), 'utf8');
 
   nock.disableNetConnect();
 });
@@ -75,7 +75,7 @@ test('correct run: folder, files and their contents', async () => {
   const actualScript = await fsp.readFile(pathToActualScript);
   expect(actualScript).toEqual(expectedScript);
 
-  const actualCSS = await fsp.readFile(pathToActualCSS);
+  const actualCSS = await fsp.readFile(pathToActualCSS, 'utf8');
   expect(actualCSS).toEqual(expectedCSS);
 });
 
