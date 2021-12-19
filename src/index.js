@@ -8,10 +8,12 @@ import CoreHTML from './classes/CoreHTML.js';
 import { getAxiosConfig } from './utils.js';
 import SourceFactory from './classes/SourceFactory.js';
 
-const logger = debug('page-loader');
-const defaultPath = process.cwd();
 
-export default function pageLoader(url, outputPath = defaultPath) {
+const logger = debug('page-loader');
+// const defaultPath = process.cwd();
+// console.log(defaultPath);
+
+export default function pageLoader(url, outputPath = process.cwd()) {
   // CoreHTML is a class for the HTML file that can be opened locally later
   const coreHTML = new CoreHTML(outputPath, url);
   const folderName = `${coreHTML.name}_files`;
