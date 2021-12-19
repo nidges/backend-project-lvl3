@@ -73,10 +73,10 @@ test('correct run: folder, files and their contents', async () => {
   expect(actualPNG).toEqual(expectedPNG);
 
   const actualScript = await fsp.readFile(pathToActualScript, 'utf8');
-  expect(actualScript).toEqual(expectedScript.trim());
+  expect(actualScript).toEqual(expectedScript);
 
   const actualCSS = await fsp.readFile(pathToActualCSS, 'utf8');
-  expect(actualCSS).toEqual(expectedCSS.trim());
+  expect(actualCSS).toEqual(expectedCSS);
 });
 
 test('axios error with 400 response code', async () => {
