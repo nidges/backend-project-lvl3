@@ -27,7 +27,7 @@ beforeAll(async () => {
 
   expectedPNG = await fsp.readFile(getFixturePath('expectedPNG.png'));
 
-  expectedScript = await fsp.readFile(getFixturePath('expectedScript.js'));
+  expectedScript = await fsp.readFile(getFixturePath('expectedScript.js'), 'utf8');
 
   expectedCSS = await fsp.readFile(getFixturePath('expectedCSS.css'), 'utf8');
 
@@ -72,11 +72,11 @@ test('correct run: folder, files and their contents', async () => {
   const actualPNG = await fsp.readFile(pathToActualPNG);
   expect(actualPNG).toEqual(expectedPNG);
 
-  const actualScript = await fsp.readFile(pathToActualScript);
-  expect(actualScript).toEqual(expectedScript);
+  const actualScript = await fsp.readFile(pathToActualScript, 'utf8');
+  expect(actualScript).toEqual(expectedScript.trim());
 
   const actualCSS = await fsp.readFile(pathToActualCSS, 'utf8');
-  expect(actualCSS).toEqual(expectedCSS);
+  expect(actualCSS).toEqual(expectedCSS.trim());
 });
 
 test('axios error with 400 response code', async () => {
