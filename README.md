@@ -1,3 +1,29 @@
+### Page-Loader
+This package provides a program that loads the web page with its local resources into your file system.
+You will be able to open it offline on your computer.
+
+**Installation:**
+1. Check if you have node.js installed (node --version). If not - install it with available package manager
+2. Clone this repo
+3. Install dependencies with 'make install' or 'npm ci'
+4. Run npm link
+5. Use page-loader -h for help with options
+
+**Usage:** page-loader [options] URL 
+
+**Options:**
+
+| Option |Description  |
+| :---        |    :----:   |
+| -V, --version     | output the version number       |
+| -0, --output [dir]   | output dir (default: process.cwd())        |
+| -h, --help   | display help        |
+
+You must provide a URL for the desirable website, Page-Loader will download this website as a .html file to output
+directory. All same-level domain resources from that core .html will be downloaded into the freshly created directory
+inside output directory, such as scripts, stylesheets or images. If an error occurs during local resources download 
+it will be skipped but the program won't shut down.
+
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/nidges/backend-project-lvl3/workflows/hexlet-check/badge.svg)](https://github.com/nidges/backend-project-lvl3/actions)
 
