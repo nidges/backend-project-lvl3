@@ -62,7 +62,8 @@ test('correct run: folder, files and their contents', async () => {
       + '    color: red;\n'
       + '}\n');
 
-  const coreHTMLPath = await pageLoader(tempDirPath, 'https://ru.hexlet.io/courses');
+  const coreHTMLPath = await pageLoader('https://ru.hexlet.io/courses', tempDirPath);
+
   expect(coreHTMLPath).toBe(path.join(tempDirPath, 'ru-hexlet-io-courses.html'));
 
   const actualCoreHTML = await fsp.readFile(coreHTMLPath, 'utf8');
@@ -84,7 +85,7 @@ test('axios error with 400 response code', async () => {
     .reply(400, '');
 
   expect.assertions(1);
-  await expect(pageLoader(tempDirPath, 'https://ru.hexlet.io/courses')).rejects.toThrow('Error! Request to https://ru.hexlet.io/courses responded with code 400');
+  await expect(pageLoader('https://ru.hexlet.io/courses', tempDirPath)).rejects.toThrow('Error! Request to https://ru.hexlet.io/courses responded with code 400');
 });
 
 test('axios request error', async () => {
@@ -93,7 +94,7 @@ test('axios request error', async () => {
     .replyWithError('request error');
 
   expect.assertions(1);
-  await expect(pageLoader(tempDirPath, 'https://ru.hexlet.io/courses')).rejects.toThrow('Error! Request to https://ru.hexlet.io/courses was made but no response was received');
+  await expect(pageLoader('https://ru.hexlet.io/courses', tempDirPath)).rejects.toThrow('Error! Request to https://ru.hexlet.io/courses was made but no response was received');
 });
 
 test("errors while downloading additional resources don't stop the program", async () => {
@@ -112,7 +113,7 @@ test("errors while downloading additional resources don't stop the program", asy
     .get('/packs/js/runtime.js')
     .reply(400, '');
 
-  await expect(pageLoader(tempDirPath, 'https://ru.hexlet.io/courses')).resolves.toBeTruthy();
+  await expect(pageLoader('https://ru.hexlet.io/courses', tempDirPath)).resolves.toBeTruthy();
 });
 
 test('directory already exists', async () => {
@@ -123,7 +124,7 @@ test('directory already exists', async () => {
   await fsp.mkdir(path.join(tempDirPath, 'ru-hexlet-io-courses_files'));
 
   expect.assertions(1);
-  await expect(pageLoader(tempDirPath, 'https://ru.hexlet.io/courses')).rejects.toThrow(`The directory "${path.join(tempDirPath, 'ru-hexlet-io-courses_files')}" can't be created, because it already exists`);
+  await expect(pageLoader('https://ru.hexlet.io/courses', tempDirPath)).rejects.toThrow(`The directory "${path.join(tempDirPath, 'ru-hexlet-io-courses_files')}" can't be created, because it already exists`);
 });
 
 test('no access to directory', async () => {
@@ -132,6 +133,6 @@ test('no access to directory', async () => {
     .reply(200, fakeHTML);
 
   await fsp.chmod(tempDirPath, 0o000);
-  await expect(pageLoader(tempDirPath, 'https://ru.hexlet.io/courses')).rejects.toThrow(`Error! You can't access folder ${tempDirPath}`);
+  await expect(pageLoader('https://ru.hexlet.io/courses', tempDirPath)).rejects.toThrow(`Error! You can't access folder ${tempDirPath}`);
   await fsp.chmod(tempDirPath, 0o666);
 });
