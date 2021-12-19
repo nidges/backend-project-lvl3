@@ -21,6 +21,6 @@ export default class Source {
     //   const newData = prettier.format(data, { parser: 'css'});
     //   return fsp.writeFile(this.path, newData, 'utf8');
     // }
-    return fsp.writeFile(this.path, data, 'utf8');
+    return fsp.writeFile(this.path, data);
   }
 }
