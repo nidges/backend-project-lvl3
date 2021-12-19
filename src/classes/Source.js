@@ -1,6 +1,7 @@
 import path from 'path';
 import fsp from 'fs/promises';
 import { getFileName, getExtension } from '../utils.js';
+import fs from 'fs';
 // import prettier from 'prettier/standalone';
 // import parserHTML from 'prettier/parser-html';
 
@@ -21,6 +22,12 @@ export default class Source {
     //   const newData = prettier.format(data, { parser: 'css'});
     //   return fsp.writeFile(this.path, newData, 'utf8');
     // }
-    return fsp.writeFile(this.path, data);
+    // return fsp.writeFile(this.path, data);
+    data.pipe(fs.createWriteStream(this.path));
+    return new Promise((resolve, reject) => {
+      data.on('end', () => resolve());
+      data.on('error', () => reject());
+    });
   }
+
 }
