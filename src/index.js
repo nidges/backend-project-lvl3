@@ -5,23 +5,18 @@ import fs from 'fs';
 import debug from 'debug';
 import Listr from 'listr';
 import CoreHTML from './classes/CoreHTML.js';
-import { getAxiosConfig } from './utils.js';
-import SourceFactory from './classes/SourceFactory.js';
-
+import Source from './classes/Source.js';
 
 const logger = debug('page-loader');
-// const defaultPath = process.cwd();
-// console.log(defaultPath);
 
 export default function pageLoader(url, outputPath = process.cwd()) {
   // CoreHTML is a class for the HTML file that can be opened locally later
   const coreHTML = new CoreHTML(outputPath, url);
   const folderName = `${coreHTML.name}_files`;
-  const coreAxiosConfig = getAxiosConfig(coreHTML.url);
   let localLinks = [];
 
   return fsp.access(outputPath, fs.constants.R_OK || fs.constants.W_OK)
-    .then(() => axios(coreAxiosConfig))
+    .then(() => axios(coreHTML.getAxiosConfig()))
     .then((response) => {
       logger(`Request to ${url} responded with status ${response.status}.`);
       // this is a list of links with the same third level domain as the CoreHTML link
@@ -38,22 +33,14 @@ export default function pageLoader(url, outputPath = process.cwd()) {
 
       const listrTasksPromises = localLinks
         .map((link) => {
-          // creating Source objects depending on their type (text or image)
+          // creating Source objects from links in .html
           // these Source files are stored in the folder and are connected to CoreHTML file
-          const SourceConstructor = SourceFactory.factory(link);
-          const source = new SourceConstructor(newOutputPath, link);
-          // const axiosConfig = getAxiosConfig(source.url);
-
-          const axiosConfig = {
-            method: 'get',
-            url: link,
-            responseType: 'stream',
-          };
+          const source = new Source(newOutputPath, link);
 
           // we are creating an array of objects correlating with Listr signature
           return {
             title: link,
-            task: (ctx, task) => axios(axiosConfig)
+            task: (ctx, task) => axios(source.getAxiosConfig())
               .then((response) => {
                 logger(`Request to ${link} responded with status ${response.status}.`);
                 return source.setSourceData(response.data);

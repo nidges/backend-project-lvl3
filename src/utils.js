@@ -1,24 +1,10 @@
 import path from 'path';
 
 const sourceExtensions = ['.png', 'jpeg', '.jpg', '.css', '.js', '.html'];
-export const imageExtensions = ['.png', '.jpeg', '.jpg'];
 
 export function getExtension(urlInstance) {
   const extension = path.parse(urlInstance.pathname).ext;
   return sourceExtensions.includes(extension) ? extension : '.html';
-}
-
-export function getAxiosConfig(urlInstance) {
-  const defaultConfig = {
-    method: 'get',
-    url: urlInstance.toString(),
-  };
-
-  // different config for images
-  if (imageExtensions.includes(getExtension(urlInstance))) {
-    return Object.assign(defaultConfig, { responseType: 'stream' });
-  }
-  return defaultConfig;
 }
 
 export function getFileName(urlInstance) {

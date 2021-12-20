@@ -14,6 +14,13 @@ export default class CoreHTML extends Source {
 
   static tags = ['img', 'link', 'script'];
 
+  getAxiosConfig() {
+    return {
+      method: 'get',
+      url: this.url.toString(),
+    };
+  }
+
   extractLocalLinks(html) {
     const links = [];
     const $ = cheerio.load(html);
