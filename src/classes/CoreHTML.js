@@ -34,10 +34,8 @@ export default class CoreHTML extends Source {
     const $ = cheerio.load(html);
     const { origin } = this.url;
 
-    // CoreHTML.tags.forEach((tag) => {
     tags.forEach((tag) => {
       $(tag).each(function () {
-        // links.push($(this).attr(CoreHTML.mapping[tag]));
         links.push($(this).attr(mapping[tag]));
       });
     });
@@ -57,10 +55,8 @@ export default class CoreHTML extends Source {
 
     // rewriting all links to core page's sources in HTML attributes
     // only links to the same third level domain pages are rewritten
-    // CoreHTML.tags.forEach((tag) => {
     tags.forEach((tag) => {
       $(tag).each(function () {
-        // const relativeLink = $(this).attr(CoreHTML.mapping[tag]);
         const relativeLink = $(this).attr(mapping[tag]);
         if (relativeLink) {
           const absoluteLink = normalizeLink(coreUrl, relativeLink);
@@ -72,7 +68,6 @@ export default class CoreHTML extends Source {
             resultingLink = absoluteLink.toString();
           }
 
-          // $(this).attr(CoreHTML.mapping[tag], resultingLink);
           $(this).attr(mapping[tag], resultingLink);
         }
       });
