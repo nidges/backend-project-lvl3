@@ -26,8 +26,8 @@ export default (url, outputPath = process.cwd()) => {
     })
     .then(() => {
       logger(`Core HTML "${coreHTML.name}${coreHTML.extension}" has been saved to "${outputPath}"`);
+      return fsp.mkdir(path.join(outputPath, folderName));
     })
-    .then(() => fsp.mkdir(path.join(outputPath, folderName)))
     .then(() => {
       const newOutputPath = path.join(outputPath, folderName);
 
