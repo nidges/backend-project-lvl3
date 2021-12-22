@@ -16,7 +16,6 @@ export default (url, outputPath = process.cwd()) => {
   let localLinks = [];
 
   return fsp.access(outputPath, fs.constants.R_OK || fs.constants.W_OK)
-    // .then(() => axios(coreHTML.getAxiosConfig()))
     .then(() => axios({
       method: 'get',
       url: coreHTML.url.toString(),
