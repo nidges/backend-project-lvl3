@@ -19,9 +19,8 @@ export default class Source {
   }
 
   setSourceData(data) {
-    // return fsp.writeFile(this.path, data);
-    data.pipe(fs.createWriteStream(this.path));
     return new Promise((resolve, reject) => {
+      data.pipe(fs.createWriteStream(this.path));
       data.on('end', () => resolve());
       data.on('error', () => reject());
     });
