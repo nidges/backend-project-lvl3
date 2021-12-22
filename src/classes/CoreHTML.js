@@ -14,13 +14,6 @@ const mapping = {
 const tags = ['img', 'link', 'script'];
 
 export default class CoreHTML extends Source {
-  getAxiosConfig() {
-    return {
-      method: 'get',
-      url: this.url.toString(),
-    };
-  }
-
   extractLocalLinks(html) {
     const links = [];
     const $ = cheerio.load(html);

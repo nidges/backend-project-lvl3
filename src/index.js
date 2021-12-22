@@ -16,7 +16,11 @@ export default (url, outputPath = process.cwd()) => {
   let localLinks = [];
 
   return fsp.access(outputPath, fs.constants.R_OK || fs.constants.W_OK)
-    .then(() => axios(coreHTML.getAxiosConfig()))
+    // .then(() => axios(coreHTML.getAxiosConfig()))
+    .then(() => axios({
+      method: 'get',
+      url: coreHTML.url.toString(),
+    }))
     .then((response) => {
       logger(`Request to ${url} responded with status ${response.status}.`);
       // this is a list of links with the same third level domain as the CoreHTML link
@@ -40,7 +44,11 @@ export default (url, outputPath = process.cwd()) => {
           // we are creating an array of objects correlating with Listr signature
           return {
             title: link,
-            task: (ctx, task) => axios(source.getAxiosConfig())
+            task: (ctx, task) => axios({
+              method: 'get',
+              url: source.url.toString(),
+              responseType: 'stream',
+            })
               .then((response) => {
                 logger(`Request to ${link} responded with status ${response.status}.`);
                 return source.setSourceData(response.data);

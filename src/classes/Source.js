@@ -10,14 +10,6 @@ export default class Source {
     this.path = path.join(outputPath, `${this.name}${this.extension}`);
   }
 
-  getAxiosConfig() {
-    return {
-      method: 'get',
-      url: this.url.toString(),
-      responseType: 'stream',
-    };
-  }
-
   setSourceData(data) {
     return new Promise((resolve, reject) => {
       data.pipe(fs.createWriteStream(this.path));
