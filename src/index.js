@@ -9,7 +9,7 @@ import Source from './classes/Source.js';
 
 const logger = debug('page-loader');
 
-export default function pageLoader(url, outputPath = process.cwd()) {
+export default (url, outputPath = process.cwd()) => {
   // CoreHTML is a class for the HTML file that can be opened locally later
   const coreHTML = new CoreHTML(outputPath, url);
   const folderName = `${coreHTML.name}_files`;

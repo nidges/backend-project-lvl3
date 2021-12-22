@@ -2,12 +2,12 @@ import path from 'path';
 
 const sourceExtensions = ['.png', 'jpeg', '.jpg', '.css', '.js', '.html'];
 
-export function getExtension(urlInstance) {
+export const getExtension = (urlInstance) => {
   const extension = path.parse(urlInstance.pathname).ext;
   return sourceExtensions.includes(extension) ? extension : '.html';
 }
 
-export function getFileName(urlInstance) {
+export const getFileName = (urlInstance) => {
   // normalizing
   let urlFullPath = `${urlInstance.host}${urlInstance.pathname}`;
   if (urlFullPath[urlFullPath.length - 1] === '/') {
@@ -34,7 +34,7 @@ export function getFileName(urlInstance) {
 // transforming absolute and two types of relative links
 // (from root and from current folder) to absolute links with correct [base]
 
-export function normalizeLink(coreUrl, link) {
+export const normalizeLink = (coreUrl, link) => {
   const { origin } = coreUrl;
 
   if (link.includes(origin) || link[0] === '/') {

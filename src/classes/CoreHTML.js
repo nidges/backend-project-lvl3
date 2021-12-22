@@ -14,14 +14,6 @@ const mapping = {
 const tags = ['img', 'link', 'script'];
 
 export default class CoreHTML extends Source {
-  // static mapping = {
-  //   img: 'src',
-  //   link: 'href',
-  //   script: 'src',
-  // };
-  //
-  // static tags = ['img', 'link', 'script'];
-
   getAxiosConfig() {
     return {
       method: 'get',

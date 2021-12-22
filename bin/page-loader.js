@@ -13,7 +13,7 @@ program
   .showHelpAfterError('(add --help for additional information)')
   .argument('<url>')
   .action((url) => {
-    Promise.resolve(pageLoader(url, program.opts().output))
+    pageLoader(url, program.opts().output)
       .then((data) => console.log(`Page was successfully downloaded into '${data}'`))
       .catch((e) => {
         console.error(e.message);
