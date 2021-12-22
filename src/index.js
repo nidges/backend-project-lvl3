@@ -77,4 +77,4 @@ export default (url, outputPath = process.cwd()) => {
         throw error;
       }
     });
-}
+};

@@ -5,7 +5,7 @@ const sourceExtensions = ['.png', 'jpeg', '.jpg', '.css', '.js', '.html'];
 export const getExtension = (urlInstance) => {
   const extension = path.parse(urlInstance.pathname).ext;
   return sourceExtensions.includes(extension) ? extension : '.html';
-}
+};
 
 export const getFileName = (urlInstance) => {
   // normalizing
@@ -15,9 +15,10 @@ export const getFileName = (urlInstance) => {
   }
 
   // removing extension if there is one
-  const extension = path.parse(urlInstance.pathname).ext;
+  const parsedUrlPath = path.parse(urlFullPath);
+  const extension = parsedUrlPath.ext;
   if (sourceExtensions.includes(extension)) {
-    urlFullPath = `${path.parse(urlFullPath).dir}/${path.parse(urlFullPath).name}`;
+    urlFullPath = `${parsedUrlPath.dir}/${parsedUrlPath.name}`;
   }
 
   // changing all not word symbols to dashes
@@ -29,7 +30,7 @@ export const getFileName = (urlInstance) => {
       return letter;
     })
     .join('');
-}
+};
 
 // transforming absolute and two types of relative links
 // (from root and from current folder) to absolute links with correct [base]
@@ -43,4 +44,4 @@ export const normalizeLink = (coreUrl, link) => {
     return new URL(link);
   }
   return new URL(`${path.parse(coreUrl.toString()).dir}/${link}`);
-}
+};
