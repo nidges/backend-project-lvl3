@@ -4,8 +4,8 @@ node_modules/
 src/try2.js
 src/buff.js
 page-loader/
-src/classes/ImageSource.js
-src/classes/SourceFactory.js
+src/classes/
+
 
 # Ignore test-related files
 /coverage.data

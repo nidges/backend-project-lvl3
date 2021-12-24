@@ -4,28 +4,39 @@ import fsp from 'fs/promises';
 import fs from 'fs';
 import debug from 'debug';
 import Listr from 'listr';
-import CoreHTML from './classes/CoreHTML.js';
-import Source from './classes/Source.js';
+import {
+  getExtension,
+  getFileName,
+  extractLocalLinks,
+  writeCoreHTML,
+  writeSource,
+} from './utils.js';
 
 const logger = debug('page-loader');
 
 export default (url, outputPath = process.cwd()) => {
-  // CoreHTML is a class for the HTML file that can be opened locally later
-  const coreHTML = new CoreHTML(outputPath, url);
+  // CoreHTML is an object for the HTML file that can be opened locally later
+  const coreHTML = {
+    coreUrl: new URL(url),
+  };
+  coreHTML.name = getFileName(coreHTML.coreUrl);
+  coreHTML.extension = getExtension(coreHTML.coreUrl);
+  coreHTML.path = path.join(outputPath, `${coreHTML.name}${coreHTML.extension}`);
   const folderName = `${coreHTML.name}_files`;
   let localLinks = [];
 
   return fsp.access(outputPath, fs.constants.R_OK || fs.constants.W_OK)
     .then(() => axios({
       method: 'get',
-      url: coreHTML.url.toString(),
+      url,
     }))
     .then((response) => {
       logger(`Request to ${url} responded with status ${response.status}.`);
-      // this is a list of links with the same third level domain as the CoreHTML link
-      // all of them lead to Sources that should be downloaded into the folder
-      localLinks = coreHTML.extractLocalLinks(response.data);
-      return coreHTML.setSourceData(response.data);
+
+      // this is a list of links with the same third level domain as the coreHTML link
+      // all of them lead to sources that should be downloaded into the folder
+      localLinks = extractLocalLinks(response.data, coreHTML.coreUrl);
+      return writeCoreHTML(response.data, coreHTML);
     })
     .then(() => {
       logger(`Core HTML "${coreHTML.name}${coreHTML.extension}" has been saved to "${outputPath}"`);
@@ -36,21 +47,26 @@ export default (url, outputPath = process.cwd()) => {
 
       const listrTasksPromises = localLinks
         .map((link) => {
-          // creating Source objects from links in .html
-          // these Source files are stored in the folder and are connected to CoreHTML file
-          const source = new Source(newOutputPath, link);
+          // creating source objects from links in .html
+          // these source files are stored in the folder and are connected to coreHTML file
+          const source = {
+            sourceUrl: new URL(link),
+          };
+          source.name = getFileName(source.sourceUrl);
+          source.extension = getExtension(source.sourceUrl);
+          source.path = path.join(newOutputPath, `${source.name}${source.extension}`);
 
           // we are creating an array of objects correlating with Listr signature
           return {
             title: link,
             task: (ctx, task) => axios({
               method: 'get',
-              url: source.url.toString(),
+              url: link,
               responseType: 'stream',
             })
               .then((response) => {
                 logger(`Request to ${link} responded with status ${response.status}.`);
-                return source.setSourceData(response.data);
+                return writeSource(response.data, source);
               })
               .then(() => {
                 logger(`File "${source.name}${source.extension}" has been saved to "${newOutputPath}"`);
@@ -63,7 +79,6 @@ export default (url, outputPath = process.cwd()) => {
         });
       // all Listr tasks will be performed simultaneously due to "concurrent: true" flag
       const tasks = new Listr(listrTasksPromises, { concurrent: true });
-      // return Promise.resolve(tasks.run());
       return tasks.run();
     })
     .then(() => coreHTML.path)
