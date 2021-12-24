@@ -63,7 +63,8 @@ export default (url, outputPath = process.cwd()) => {
         });
       // all Listr tasks will be performed simultaneously due to "concurrent: true" flag
       const tasks = new Listr(listrTasksPromises, { concurrent: true });
-      return Promise.resolve(tasks.run());
+      // return Promise.resolve(tasks.run());
+      return tasks.run();
     })
     .then(() => coreHTML.path)
     .catch((error) => {
