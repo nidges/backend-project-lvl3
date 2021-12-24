@@ -1,8 +1,11 @@
 node_modules/
 .idea/
+.DS_Store
 src/try2.js
 src/buff.js
 page-loader/
+src/classes/ImageSource.js
+src/classes/SourceFactory.js
 
 # Ignore test-related files
 /coverage.data
